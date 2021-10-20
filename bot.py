@@ -46,25 +46,34 @@ async def teams(ctx):
 
 @bot.command()
 # @commands.has_permissions()
-async def setup(ctx, game):
-    if game.upper() == "LOL":
+async def setup(ctx, *game):
+    if not game:
+        await ctx.send("You must specify a game to setup. Example: !setup LoL")
+    else:
+        if game[0].upper() == "LOL":
 
-        if not get(ctx.guild.categories, name="UTP: League of Legends"):
-            await ctx.guild.create_category("UTP: League of Legends")
+            if not get(ctx.guild.categories, name="UTP: League of Legends"):
+                await ctx.guild.create_category("UTP: League of Legends")
 
-        category = get(ctx.guild.categories, name="UTP: League of Legends")
+            category = get(ctx.guild.categories, name="UTP: League of Legends")
 
-        text_channels = ["Bot Commands"]
-        for channel in text_channels:
-            if channel not in ctx.guild.channels:
-                await ctx.guild.create_text_channel(channel, category=category)
+            text_channels = ["bot-commands"]
+            for channel in text_channels:
+                if not get(
+                    ctx.guild.text_channels, name=channel, category=category
+                ):
+                    await ctx.guild.create_text_channel(
+                        channel, category=category
+                    )
 
-        voice_channels = ["Lobby", "Team 1", "Team 2"]
-        for channel in voice_channels:
-            if channel not in ctx.guild.channels:
-                await ctx.guild.create_voice_channel(
-                    channel, category=category
-                )
+            voice_channels = ["Lobby", "Team 1", "Team 2"]
+            for channel in voice_channels:
+                if not get(
+                    ctx.guild.voice_channels, name=channel, category=category
+                ):
+                    await ctx.guild.create_voice_channel(
+                        channel, category=category
+                    )
 
 
 if __name__ == "__main__":
