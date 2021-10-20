@@ -28,8 +28,8 @@ async def teams(ctx):
     if ctx.author.voice and ctx.author.voice.channel:
         game_channel = ctx.author.voice.channel
 
-        team_1 = get(ctx.guild.voice_channels, name="Chat")
-        team_2 = get(ctx.guild.voice_channels, name="Mushroom Zone")
+        team_1 = get(ctx.guild.voice_channels, name="Team 1")
+        team_2 = get(ctx.guild.voice_channels, name="Team 2")
 
         team_channels = [team_1, team_2]
 
@@ -42,6 +42,29 @@ async def teams(ctx):
 
     else:
         await ctx.send("You're not connected to a voice channel.")
+
+
+@bot.command()
+# @commands.has_permissions()
+async def setup(ctx, game):
+    if game.upper() == "LOL":
+
+        if not get(ctx.guild.categories, name="UTP: League of Legends"):
+            await ctx.guild.create_category("UTP: League of Legends")
+
+        category = get(ctx.guild.categories, name="UTP: League of Legends")
+
+        text_channels = ["Bot Commands"]
+        for channel in text_channels:
+            if channel not in ctx.guild.channels:
+                await ctx.guild.create_text_channel(channel, category=category)
+
+        voice_channels = ["Lobby", "Team 1", "Team 2"]
+        for channel in voice_channels:
+            if channel not in ctx.guild.channels:
+                await ctx.guild.create_voice_channel(
+                    channel, category=category
+                )
 
 
 if __name__ == "__main__":
