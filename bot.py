@@ -6,12 +6,8 @@ from discord.ext import commands
 from discord.utils import get
 from dotenv import load_dotenv
 
-from utils import (
-    create_category,
-    create_text_channels,
-    create_voice_channels,
-    get_team_channels,
-)
+from games.LoL import LoL
+from utils import get_team_channels
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -78,12 +74,12 @@ async def setup(ctx, *game):
     else:
         if game[0].upper() == "LOL":
 
-            text_channels = ["bot-commands"]
-            voice_channels = ["Lobby", "Team 1", "Team 2"]
+            game_LoL = LoL(ctx)
 
-            category = await create_category(ctx, "UTP: League of Legends")
-            await create_text_channels(ctx, text_channels, category)
-            await create_voice_channels(ctx, voice_channels, category)
+            await game_LoL.create_category(ctx)
+            await game_LoL.create_commands_channel(ctx)
+            await game_LoL.create_lobby_channel(ctx)
+            await game_LoL.create_team_channels(ctx)
 
 
 if __name__ == "__main__":
