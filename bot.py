@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-from game_setup import setup_factory
+from games import supported_games
 from utils import split_teams
 
 load_dotenv()
@@ -25,16 +25,27 @@ async def on_ready():
 
 
 @bot.command()
-# @commands.has_permissions()
-async def setup(ctx, *game):
+async def setup(ctx, game_key):
     """
     setup command that creates channels
     and category based on pre defined games
     """
-    if not game:
-        await ctx.send("You must specify a game to setup. Example: !setup LoL")
-    else:
-        await setup_factory(ctx, game[0])
+
+    game_key = game_key.upper()
+
+    if game_key not in supported_games:
+        return await ctx.send("Error: Invalid game.")
+
+    game = supported_games[game_key]
+    await game.create_category(ctx)
+    await game.create_channels(ctx)
+
+
+@setup.error
+async def on_command_error(ctx, error):
+    """handles errors for !setup bot command"""
+    if isinstance(error, commands.errors.MissingRequiredArgument):
+        return await ctx.send('Error: No game argument. Example: "!setup LoL"')
 
 
 @bot.command()

@@ -6,52 +6,53 @@ from discord.utils import get
 class Game:
     """mixin for discord game categories"""
 
+    _category = ""
+    _bot_commands = "bot-commands"
+    _lobby = "Lobby"
+    _teams = []
+
     def __init__(self, category: str, teams: List[str]) -> None:
         self._category = category
-        self._bot_commands = "bot-commands"
-        self._lobby = "Lobby"
         self._teams = teams
 
     @classmethod
     def _get_category(cls, ctx):
         return get(ctx.guild.categories, name=cls._category) or None
 
-    async def create_category(self):
+    @classmethod
+    async def create_category(cls, ctx):
         """
         creates a category with name param if category
         does not already exist.
         """
-        if not self._get_category(self.ctx):
-            await self.ctx.guild.create_category(self._category)
+        if not cls._get_category(ctx):
+            await ctx.guild.create_category(cls._category)
 
-    async def create_channels(self):
+    @classmethod
+    async def create_channels(cls, ctx):
         """
         creates all channels in the game category if
         channels do not already exist.
         """
 
-        category = self._get_category(self.ctx)
+        category = cls._get_category(ctx)
 
         if not get(
-            self.ctx.guild.text_channels,
-            name=self._bot_commands,
+            ctx.guild.text_channels,
+            name=cls._bot_commands,
             category=category,
         ):
-            await self.ctx.guild.create_text_channel(
-                self._bot_commands, category=category
+            await ctx.guild.create_text_channel(
+                cls._bot_commands, category=category
             )
 
         if not get(
-            self.ctx.guild.voice_channels, name=self._lobby, category=category
+            ctx.guild.voice_channels, name=cls._lobby, category=category
         ):
-            await self.ctx.guild.create_voice_channel(
-                self._lobby, category=category
-            )
+            await ctx.guild.create_voice_channel(cls._lobby, category=category)
 
-        for team in self._teams:
-            if not get(
-                self.ctx.guild.voice_channels, name=team, category=category
-            ):
-                await self.ctx.guild.create_voice_channel(
+        for team in cls._teams:
+            if not get(ctx.guild.voice_channels, name=team, category=category):
+                await ctx.guild.create_voice_channel(
                     team, category=category, user_limit=5
                 )
