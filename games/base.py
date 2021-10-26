@@ -1,22 +1,23 @@
-from typing import List
-
 from discord.utils import get
 
 
 class Game:
-    """mixin for discord game categories"""
+    """
+    base class containing methods for creating game
+    channels
 
-    _category = ""
+    subclasses must define:
+        name: str
+        arg: str
+        _teams: List
+    """
+
     _bot_commands = "bot-commands"
     _lobby = "Lobby"
-    _teams = []
-
-    def __init__(self, category: str, teams: List[str]) -> None:
-        self._category = category
-        self._teams = teams
 
     @classmethod
     def _get_category(cls, ctx):
+        cls._category = "UTP: " + cls.name
         return get(ctx.guild.categories, name=cls._category) or None
 
     @classmethod

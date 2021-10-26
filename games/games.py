@@ -1,12 +1,7 @@
-from discord.abc import GuildChannel
-
-from .mixin import Game
+from .base import Game
 
 
-class Lol(GuildChannel, Game):
-    _category = "UTP: League of Legends"
+class Lol(Game):
+    name = "League of Legends"
+    arg = "LoL"
     _teams = ["Team 1", "Team 2"]
-
-    def __init__(self, ctx):
-        self.ctx = ctx
-        super().__init__(self._category, self._teams)

@@ -25,6 +25,20 @@ async def on_ready():
 
 
 @bot.command()
+async def games(ctx):
+    """
+    command that returns a message listing all
+    supported game channels available and their
+    setup arguments
+    """
+    message = ""
+    for game in supported_games.values():
+        message += f"{game.name}: {game.arg}\r"
+
+    await ctx.send(f"Supported Games:```{message}```")
+
+
+@bot.command()
 async def setup(ctx, game_key):
     """
     setup command that creates channels
@@ -34,7 +48,7 @@ async def setup(ctx, game_key):
     game_key = game_key.upper()
 
     if game_key not in supported_games:
-        return await ctx.send("Error: Invalid game.")
+        return await ctx.send("Error: Game not supported. Try: !games")
 
     game = supported_games[game_key]
     await game.create_category(ctx)
@@ -44,8 +58,8 @@ async def setup(ctx, game_key):
 @setup.error
 async def on_command_error(ctx, error):
     """handles errors for !setup bot command"""
-    if isinstance(error, commands.errors.MissingRequiredArgument):
-        return await ctx.send('Error: No game argument. Example: "!setup LoL"')
+    if isinstance(error, commands.MissingRequiredArgument):
+        return await ctx.send('Error: Missing argument. Example: "!setup LoL"')
 
 
 @bot.command()
