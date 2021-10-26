@@ -44,7 +44,6 @@ async def setup(ctx, game_key):
     setup command that creates channels
     and category based on pre defined games
     """
-
     game_key = game_key.upper()
 
     if game_key not in supported_games:
@@ -68,6 +67,8 @@ async def teams(ctx):
     command that splits users in voice channels between teams
     in current channel category
     """
+    if not ctx.author.voice or not ctx.author.voice.channel:
+        return await ctx.send("You must be connected to a voice channel.")
 
     await split_teams(ctx)
 

@@ -7,7 +7,6 @@ def get_team_channels(ctx):
 
     returns list containing team objects
     """
-
     category = ctx.author.voice.channel.category
 
     return [
@@ -43,9 +42,6 @@ async def split_teams(ctx):
     splits the teams with a function as long as command
     user is in a valid lobby channel.
     """
-    if not ctx.author.voice or not ctx.author.voice.channel:
-        return await ctx.send("You must be connected to a voice channel.")
-
     game_channel = ctx.author.voice.channel
     players = game_channel.members
 
