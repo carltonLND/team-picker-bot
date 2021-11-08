@@ -5,7 +5,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from games import supported_games
-from utils import split_teams
+from utils import CustomHelp, move_to_lobby, split_teams
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -14,22 +14,37 @@ intents = discord.Intents.default()
 intents.members = True
 intents.presences = True
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+help = CustomHelp(no_category="Bot Commands")
+bot = commands.Bot(command_prefix="!", intents=intents, help_command=help)
 
 
 @bot.event
 async def on_ready():
+    """
+    Prints a list of connected guilds on startup
+    """
     print(f"{bot.user} is connected to the following guilds:")
     for guild in bot.guilds:
         print(f"{guild.name}(id: {guild.id})")
 
 
 @bot.command()
+async def lobby(ctx):
+    """
+    Moves users back to Lobby channel
+    """
+    channel = ctx.author.voice.channel
+
+    if channel.name == "Lobby" or not channel.category.name.startswith("UTP:"):
+        return await ctx.send("Must be connected to a valid team channel.")
+
+    await move_to_lobby(ctx)
+
+
+@bot.command()
 async def games(ctx):
     """
-    command that returns a message listing all
-    supported game channels available and their
-    setup arguments
+    Lists all currently support games
     """
     message = ""
     for game in supported_games.values():
@@ -41,8 +56,7 @@ async def games(ctx):
 @bot.command()
 async def setup(ctx, game_key):
     """
-    setup command that creates channels
-    and category based on pre defined games
+    Create game category Example: !setup LoL
     """
     game_key = game_key.upper()
 
@@ -64,8 +78,7 @@ async def on_command_error(ctx, error):
 @bot.command()
 async def teams(ctx):
     """
-    command that splits users in voice channels between teams
-    in current channel category
+    Randomly moves players into team channels
     """
     if not ctx.author.voice or not ctx.author.voice.channel:
         return await ctx.send("You must be connected to a voice channel.")
